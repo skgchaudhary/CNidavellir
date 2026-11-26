@@ -1,0 +1,3 @@
+# All zip files belong in releases/; zips anywhere else are ignored.
+*.zip
+!releases/*.zip
