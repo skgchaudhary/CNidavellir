@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNidavellir 1.0.0 Guide</title>
+<meta name="description" content="What CNidavellir 1.0.0 can do and how to use it: setup, the folder explorer, editing C files, saving, Build &amp; Run, and known limitations.">
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --surface: #ffffff;
+    --text: #18222e;
+    --muted: #55616f;
+    --border: #dcdfe4;
+    --accent: #8a5c0c;
+    --accent-soft: #f3e6c8;
+    --note-bg: #eef3f9;
+    --note-border: #9bb3cc;
+    --warn-bg: #fbf0e4;
+    --warn-border: #d9a35c;
+    --kbd-bg: #f1f2f4;
+    --code-bg: #0c1520;
+    --code-panel: #101d2b;
+    --code-text: #d9e8fc;
+    --code-line: #40556b;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c1520;
+      --surface: #101d2b;
+      --text: #d9e8fc;
+      --muted: #9eb0c4;
+      --border: #26384b;
+      --accent: #e2b95f;
+      --accent-soft: #2b2716;
+      --note-bg: #132436;
+      --note-border: #40556b;
+      --warn-bg: #2a2014;
+      --warn-border: #a8783a;
+      --kbd-bg: #1a2b3d;
+      --code-bg: #08101a;
+      --code-panel: #0c1520;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1520;
+    --surface: #101d2b;
+    --text: #d9e8fc;
+    --muted: #9eb0c4;
+    --border: #26384b;
+    --accent: #e2b95f;
+    --accent-soft: #2b2716;
+    --note-bg: #132436;
+    --note-border: #40556b;
+    --warn-bg: #2a2014;
+    --warn-border: #a8783a;
+    --kbd-bg: #1a2b3d;
+    --code-bg: #08101a;
+    --code-panel: #0c1520;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+
+  header.hero {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  header.hero .wrap { padding-top: 40px; padding-bottom: 32px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 2px 10px; border-radius: 999px;
+  }
+  h1 { font-size: clamp(30px, 5vw, 42px); line-height: 1.15; margin: 14px 0 10px; }
+  .lede { font-size: 18px; color: var(--muted); margin: 0 0 22px; max-width: 62ch; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border-radius: 8px; font-weight: 600; text-decoration: none;
+    border: 1px solid var(--border); color: var(--text); background: var(--surface);
+  }
+  .btn.primary { background: #e2b95f; border-color: #c99a3a; color: #101722; }
+  .btn:hover { filter: brightness(1.05); }
+  .btn:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  nav.toc { margin: 28px 0 8px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  nav.toc h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; border: 0; padding: 0; }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2 220px; column-gap: 32px; }
+  nav.toc li { break-inside: avoid; padding: 1px 0; }
+
+  main section { padding-top: 12px; }
+  h2 {
+    font-size: 26px; line-height: 1.25; margin: 44px 0 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border); scroll-margin-top: 16px;
+  }
+  h3 { font-size: 19px; margin: 28px 0 8px; scroll-margin-top: 16px; }
+  p, li { max-width: 72ch; }
+  a { color: var(--accent); }
+  ul, ol { padding-left: 22px; }
+  li + li { margin-top: 4px; }
+
+  code, kbd, pre { font-family: Consolas, "Cascadia Mono", "SFMono-Regular", Menlo, monospace; }
+  code { font-size: .92em; background: var(--kbd-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  kbd {
+    font-size: .86em; background: var(--kbd-bg); border: 1px solid var(--border); border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 6px; white-space: nowrap;
+  }
+  pre {
+    background: var(--code-bg); color: var(--code-text);
+    padding: 14px 16px; border-radius: 8px; overflow-x: auto; font-size: 14.5px; line-height: 1.55;
+    border: 1px solid var(--code-line);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+
+  figure { margin: 22px 0; }
+  figure img {
+    display: block; width: 100%; height: auto;
+    border-radius: 8px; border: 1px solid var(--border);
+    box-shadow: 0 6px 24px rgba(8, 16, 26, .18);
+  }
+  figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; }
+
+  .table-wrap { overflow-x: auto; margin: 14px 0 18px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  td code { white-space: nowrap; }
+  table.wrap-code td code { white-space: normal; }
+  table.wrap-code td:first-child { width: 48%; }
+
+  .callout { border-left: 4px solid var(--note-border); background: var(--note-bg); padding: 10px 16px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+  .callout.warn { border-left-color: var(--warn-border); background: var(--warn-bg); }
+  .callout p { margin: 4px 0; }
+
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: step; position: relative; padding-left: 40px; margin-top: 12px; }
+  .steps > li::before {
+    content: counter(step); position: absolute; left: 0; top: 1px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 16px 0; }
+  .layout div { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .layout strong { display: block; margin-bottom: 2px; }
+  .layout span { color: var(--muted); font-size: 15px; }
+
+  .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(0,0,0,.25); }
+  .hl-kw { color: #bd8bff; } .hl-ty { color: #5ad8f2; } .hl-st { color: #86e987; }
+  .hl-nu { color: #ff9a58; } .hl-pp { color: #7fc4ff; } .hl-co { color: #8ca4bc; }
+
+  .limits li { margin-top: 10px; }
+  footer { margin-top: 56px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+  footer .wrap { padding-top: 20px; padding-bottom: 40px; }
+
+  @media (max-width: 560px) {
+    body { font-size: 15.5px; }
+    h2 { font-size: 23px; }
+    nav.toc ol { columns: 1; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Version 1.0.0 · Windows x64</span>
+    <h1>CNidavellir feature guide</h1>
+    <p class="lede">CNidavellir is a small Windows editor for writing, compiling and running single-file C and C++ programs. This guide covers everything version 1.0.0 can do in the portable Windows release.</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="https://github.com/skgchaudhary/CNidavellir/blob/main/releases/CNidavellir-1.0.0-windows-x64.zip">Download the 1.0.0 ZIP</a>
+      <a class="btn" href="#setup">Set up</a>
+      <a class="btn" href="#limitations">Known limitations</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <figure>
+    <img src="images/editor.png" width="1491" height="950"
+         alt="The CNidavellir window. The folder explorer on the left shows a folder named c with a subfolder named flow. The editor on the right has lets.c open with colour-highlighted C code, and the empty Build output panel sits below it.">
+    <figcaption>The CNidavellir window with a folder open in the explorer and <code>lets.c</code> in the editor.</figcaption>
+  </figure>
+
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#setup">Set up</a></li>
+      <li><a href="#window">The window</a></li>
+      <li><a href="#explorer">Open a folder</a></li>
+      <li><a href="#files">Create, open and close files</a></li>
+      <li><a href="#editing">Edit code</a></li>
+      <li><a href="#saving">Save</a></li>
+      <li><a href="#build">Build &amp; Run</a></li>
+      <li><a href="#build-fails">When a build fails</a></li>
+      <li><a href="#no-recompile">Running without recompiling</a></li>
+      <li><a href="#console">How your program is launched</a></li>
+      <li><a href="#delete">Delete files and folders</a></li>
+      <li><a href="#session">What CNidavellir remembers</a></li>
+      <li><a href="#shortcuts">Keyboard shortcuts</a></li>
+      <li><a href="#limitations">Known limitations</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="setup">
+      <h2>Set up</h2>
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            <tr><th scope="row">Java</th><td>Java 21 or newer is required. The app is built for Java 21 and won't run on older versions. The launcher needs <code>javaw.exe</code> on your <code>PATH</code>, or Windows set up to open <code>.jar</code> files with Java.</td></tr>
+            <tr><th scope="row">GCC</th><td>Included. The ZIP contains a complete GCC toolchain (w64devkit 2.11.0) in the <code>mingw64</code> folder, with <code>gcc.exe</code> for C and <code>g++.exe</code> for C++. You don't need to install a compiler.</td></tr>
+            <tr><th scope="row">Launch</th><td>Double-click <code>CNidavellir.exe</code>, or run <code>.\CNidavellir.exe</code> from PowerShell in the extracted folder.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ol class="steps">
+        <li>Install Java 21 or newer if you don't have it.</li>
+        <li>Extract the <strong>entire</strong> ZIP into a folder of your choice. Keep <code>CNidavellir.exe</code>, <code>CNidavellir.jar</code> and the <code>mingw64</code> folder together, because Build &amp; Run looks for the compiler in <code>mingw64</code> next to <code>CNidavellir.jar</code>.</li>
+        <li>Start CNidavellir from that folder:
+<pre><code>.\CNidavellir.exe</code></pre>
+          You can also start the app directly with Java:
+<pre><code>java -jar CNidavellir.jar</code></pre>
+        </li>
+      </ol>
+
+      <p>If Java can't be found, the launcher shows: <em>“Could not start CNidavellir. Install Java 21 or newer and keep CNidavellir.jar beside this launcher.”</em></p>
+      <p>On first launch, the window opens with a new, unsaved file called <code>Untitled.c</code> that contains a “Hello, World!” program. The explorer stays empty until you open a folder.</p>
+    </section>
+
+    <section id="window">
+      <h2>The window</h2>
+      <p>The window title shows the version: <strong>CNidavellir 1.0.0</strong>. The window has five areas. You can drag the dividers between them to resize.</p>
+      <div class="layout">
+        <div><strong>Explorer (left)</strong><span><b>Open Folder</b>, the refresh button (↻), and a tree of the folder's contents.</span></div>
+        <div><strong>Toolbar (top right)</strong><span><b>New</b>, <b>Save</b> and <b>Build &amp; Run</b>.</span></div>
+        <div><strong>File tab</strong><span>The open file's name, followed by <code>*</code> when it has unsaved changes. Click <b>×</b> to close the file.</span></div>
+        <div><strong>Editor</strong><span>Where you write code, with C syntax highlighting.</span></div>
+        <div><strong>Build output (bottom)</strong><span>Read-only messages from saving, compiling and launching.</span></div>
+      </div>
+    </section>
+
+    <section id="explorer">
+      <h2>Open a folder</h2>
+      <ol class="steps">
+        <li>Click <b>Open Folder</b> and choose a folder. The picker only lets you select folders.</li>
+        <li>The folder appears at the top of the tree, already expanded. Click the arrow next to a subfolder to expand it. Its contents load when you expand it, and you may briefly see “Loading...”.</li>
+        <li>Click a <code>.c</code>, <code>.cpp</code> or <code>.h</code> file once to open it in the editor.</li>
+      </ol>
+      <ul>
+        <li>The tree shows every file and folder, including <code>.exe</code> files. Folders are listed first, then files, each in alphabetical order (not case-sensitive).</li>
+        <li>Clicking any other kind of file does nothing. Clicking the file that's already open does nothing either.</li>
+        <li>The tree refreshes when you click ↻, when you switch back to the CNidavellir window, and after every successful build, so a new <code>.exe</code> appears without extra steps. Refreshing keeps your expanded folders and selection.</li>
+        <li>If a folder can't be read, CNidavellir shows “Could not list folder:” followed by the reason.</li>
+      </ul>
+    </section>
+
+    <section id="files">
+      <h2>Create, open and close files</h2>
+      <p>CNidavellir edits one file at a time. Opening or creating a file replaces the current one in the editor.</p>
+
+      <h3>Supported file types</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Open and edit</th><th>Build &amp; Run</th></tr></thead>
+          <tbody>
+            <tr><td><code>.c</code></td><td>Yes</td><td>Yes, with <code>gcc</code> using the C17 standard</td></tr>
+            <tr><td><code>.cpp</code></td><td>Yes</td><td>Yes, with <code>g++</code> using the C++17 standard</td></tr>
+            <tr><td><code>.h</code></td><td>Yes</td><td>No. Build &amp; Run is unavailable for header files.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Extensions are matched regardless of case, so <code>MAIN.C</code> works too. Files are read and saved as UTF-8.</p>
+
+      <h3>Create a new file</h3>
+      <ol class="steps">
+        <li>Click <b>New</b>. The editor shows <code>Untitled.c</code> with a starter program:
+<pre><code><span class="hl-pp">#include &lt;stdio.h&gt;</span>
+
+<span class="hl-ty">int</span> main(<span class="hl-ty">void</span>) {
+    printf(<span class="hl-st">"Hello, World!\n"</span>);
+    <span class="hl-kw">return</span> <span class="hl-nu">0</span>;
+}</code></pre>
+        </li>
+        <li>Write your code, then click <b>Save</b> to choose a name and location (see <a href="#saving">Save</a>).</li>
+      </ol>
+
+      <h3>Close a file</h3>
+      <p>Click <b>×</b> on the file tab. With no file open, the editor is blank and read-only, and <b>Save</b> and <b>Build &amp; Run</b> are unavailable. Click a file in the explorer or click <b>New</b> to continue.</p>
+
+      <h3>Unsaved changes</h3>
+      <p>If the current file has unsaved changes and you open another file, click <b>New</b>, close the tab, delete the open file, or close the window, CNidavellir asks <em>“Save changes to …?”</em>:</p>
+      <ul>
+        <li><b>Yes</b> saves the file, then continues.</li>
+        <li><b>No</b> discards your changes, then continues.</li>
+        <li><b>Cancel</b> stops, leaving everything as it was.</li>
+      </ul>
+    </section>
+
+    <section id="editing">
+      <h2>Edit code</h2>
+      <ul>
+        <li><strong>Font:</strong> code uses Consolas, or Java's standard monospaced font if Consolas isn't installed.</li>
+        <li><strong>Auto-indent:</strong> pressing <kbd>Enter</kbd> starts the new line with the same spaces and tabs as the current line.</li>
+        <li><strong>Tabs:</strong> <kbd>Tab</kbd> inserts a tab character, displayed four columns wide.</li>
+        <li><strong>Undo and redo:</strong> <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes and <kbd>Ctrl</kbd>+<kbd>Y</kbd> redoes. Undo history is cleared when you open another file or click <b>New</b>. Saving keeps it.</li>
+        <li><strong>Unsaved marker:</strong> any edit adds <code>*</code> after the name on the file tab until you save.</li>
+      </ul>
+
+      <h3>C syntax highlighting</h3>
+      <p>The editor colours your code as you type:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Colour</th><th>What gets it</th></tr></thead>
+          <tbody>
+            <tr><td><span class="swatch" style="background:#bd8bff"></span>Purple</td><td>Keywords: <code>return</code> <code>if</code> <code>else</code> <code>while</code> <code>for</code> <code>do</code> <code>switch</code> <code>case</code> <code>break</code> <code>continue</code> <code>default</code> <code>goto</code> <code>sizeof</code> <code>typedef</code> <code>struct</code> <code>union</code> <code>enum</code> <code>static</code> <code>const</code> <code>extern</code> <code>volatile</code> <code>inline</code> <code>restrict</code> <code>auto</code> <code>register</code> <code>signed</code> <code>unsigned</code></td></tr>
+            <tr><td><span class="swatch" style="background:#5ad8f2"></span>Cyan</td><td>Types: <code>int</code> <code>char</code> <code>void</code> <code>short</code> <code>long</code> <code>float</code> <code>double</code> <code>bool</code> <code>_Bool</code> <code>size_t</code> <code>wchar_t</code></td></tr>
+            <tr><td><span class="swatch" style="background:#86e987"></span>Green</td><td>String literals (<code>"…"</code>) and character literals (<code>'…'</code>), including escapes such as <code>\n</code></td></tr>
+            <tr><td><span class="swatch" style="background:#ff9a58"></span>Orange</td><td>Numbers, such as <code>10</code>, <code>3.14</code> and <code>0xFF</code></td></tr>
+            <tr><td><span class="swatch" style="background:#7fc4ff"></span>Blue</td><td>Preprocessor lines: any line whose first non-space character is <code>#</code></td></tr>
+            <tr><td><span class="swatch" style="background:#8ca4bc"></span>Grey</td><td>Comments: <code>// …</code> to the end of the line, and <code>/* … */</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+<pre><code><span class="hl-pp">#include &lt;stdio.h&gt;</span>
+
+<span class="hl-co">/* Print a pointer and its value */</span>
+<span class="hl-ty">int</span> main(<span class="hl-ty">void</span>) {
+    <span class="hl-ty">int</span> x = <span class="hl-nu">10</span>;
+    <span class="hl-ty">int</span> *ptr_x = &amp;x;
+    printf(<span class="hl-st">"Address: %p\n"</span>, (<span class="hl-ty">void</span> *)ptr_x);  <span class="hl-co">// pointer</span>
+    <span class="hl-kw">return</span> <span class="hl-nu">0</span>;
+}</code></pre>
+      <p><code>.cpp</code> files are coloured with the same C rules.</p>
+    </section>
+
+    <section id="saving">
+      <h2>Save</h2>
+      <p>Click <b>Save</b>. There's no keyboard shortcut for saving.</p>
+      <ul>
+        <li><strong>A file that's already saved:</strong> CNidavellir writes the editor's contents back to the same file, and the <code>*</code> on the tab disappears. If you haven't changed anything and the file on disk hasn't changed, nothing is written.</li>
+        <li><strong>A new file</strong> (<code>Untitled.c</code>): a Save dialog opens. It starts in the folder CNidavellir was launched from, not the folder in the explorer, so browse to your project folder first.
+          <ul>
+            <li>CNidavellir adds <code>.c</code> to any name that doesn't already end in <code>.c</code>. For example, <code>hello</code> is saved as <code>hello.c</code>.</li>
+            <li>If the file already exists, you're asked <em>“Overwrite …?”</em>. Choose <b>No</b> to cancel the save.</li>
+          </ul>
+        </li>
+        <li>If saving fails, CNidavellir shows “Could not save file:” followed by the reason.</li>
+      </ul>
+      <p>Build &amp; Run saves automatically before it compiles.</p>
+    </section>
+
+    <section id="build">
+      <h2>Build &amp; Run</h2>
+      <figure>
+        <img src="images/build-and-run.png" width="1608" height="948"
+             alt="CNidavellir after Build and Run. The Build output panel shows the lines Building lets.c, Compilation successful. Opening console, and Console opened. Check the taskbar if it is behind the IDE. A separate Command Prompt window shows the program's printed addresses and values, then a command prompt in the program's folder.">
+        <figcaption>A successful Build &amp; Run. Compiler messages appear in Build output, and the program runs in its own Command Prompt window.</figcaption>
+      </figure>
+
+      <p>Click <b>Build &amp; Run</b> with a <code>.c</code> or <code>.cpp</code> file open, or a new unsaved file. It's unavailable when a <code>.h</code> file is open, when no file is open, and while a build is in progress.</p>
+      <ol class="steps">
+        <li><strong>Save.</strong> The file is saved first. For a new file, the Save dialog opens. If you cancel it, nothing is built.</li>
+        <li><strong>Compile.</strong> Build output shows <code>Building &lt;file&gt;...</code>, and the compiler runs in the file's folder. Its warnings and errors appear in Build output line by line.</li>
+        <li><strong>Run.</strong> If compilation succeeds, Build output shows <code>Compilation successful. Opening console...</code>, the explorer refreshes, and the program starts in a new console window (see <a href="#console">How your program is launched</a>).</li>
+      </ol>
+
+      <h3>The compiler command</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Open file</th><th>Command CNidavellir runs</th></tr></thead>
+          <tbody>
+            <tr><td><code>lets.c</code></td><td><code>gcc.exe -Wall -Wextra -std=c17 lets.c -o lets.exe</code></td></tr>
+            <tr><td><code>lets.cpp</code></td><td><code>g++.exe -Wall -Wextra -std=c++17 lets.cpp -o lets.exe</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li>The program is saved as an <code>.exe</code> with the same name, in the same folder as the source file, replacing any earlier build.</li>
+        <li><code>-Wall -Wextra</code> turns on extra warnings. Warnings appear in Build output but don't stop the build. Only errors do.</li>
+        <li>Only the open file is compiled. Other source files in the folder are not compiled or linked.</li>
+        <li>CNidavellir looks for the compiler in <code>mingw64\bin</code> next to <code>CNidavellir.jar</code>, then next to <code>CNidavellir.jar</code> itself, then on your <code>PATH</code>. If it can't find one, it reports: <code>gcc.exe was not found. Place a complete mingw64 toolchain beside the JAR, or add it to PATH.</code> For <code>.cpp</code> files, the message names <code>g++.exe</code>.</li>
+      </ul>
+
+      <h3>Build output messages</h3>
+      <div class="table-wrap">
+        <table class="wrap-code">
+          <thead><tr><th>Message</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>Building lets.c...</code></td><td>Compilation has started.</td></tr>
+            <tr><td><code>Compilation successful. Opening console...</code></td><td>The <code>.exe</code> was built and is about to run.</td></tr>
+            <tr><td><code>Console opened. Check the taskbar if it is behind the IDE.</code></td><td>The program's console window was started. It may open behind CNidavellir.</td></tr>
+            <tr><td><code>Compilation failed (exit code N).</code></td><td>The compiler reported errors. The program is not run.</td></tr>
+            <tr><td><code>Source unchanged; running the already built lets.exe.</code></td><td>Nothing changed since the last build, so the existing <code>.exe</code> runs without recompiling.</td></tr>
+            <tr><td><code>Could not start …</code> or <code>Build failed: …</code></td><td>The compiler was found but couldn't be started, or the build hit an unexpected error.</td></tr>
+            <tr><td><code>Could not open program console: …</code></td><td>The program built, but its console window couldn't be opened.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="build-fails">
+      <h2>When a build fails</h2>
+      <ul>
+        <li>Build output lists the compiler's error messages, which include line numbers, followed by <code>Compilation failed (exit code N).</code></li>
+        <li>The program is <strong>not</strong> run, and no console window opens.</li>
+        <li>Fix the errors and click <b>Build &amp; Run</b> again. After a failed build, the next Build &amp; Run always recompiles.</li>
+      </ul>
+    </section>
+
+    <section id="no-recompile">
+      <h2>Running without recompiling</h2>
+      <p>If you click <b>Build &amp; Run</b> again and nothing has changed, CNidavellir runs the existing <code>.exe</code> straight away and shows <code>Source unchanged; running the already built &lt;name&gt;.exe.</code> This happens only when <strong>all</strong> of the following are true:</p>
+      <ul>
+        <li>It's the same file that was last built successfully in this session.</li>
+        <li>The editor's text is exactly the same as when it was built.</li>
+        <li>The <code>.exe</code> still exists.</li>
+        <li>The file has no local includes, meaning no line like <code>#include "myheader.h"</code>.</li>
+      </ul>
+      <div class="callout">
+        <p>Files with a quoted <code>#include "…"</code> are always recompiled, because CNidavellir can't tell whether the header changed. Angle-bracket includes such as <code>#include &lt;stdio.h&gt;</code> don't count.</p>
+        <p>CNidavellir only remembers the last build until you close it. The first Build &amp; Run after starting the app always compiles.</p>
+      </div>
+    </section>
+
+    <section id="console">
+      <h2>How your program is launched</h2>
+      <p>CNidavellir uses a hidden Windows PowerShell command to open a new <strong>Command Prompt</strong> window, which runs your program like this:</p>
+<pre><code>cmd.exe /k ".\lets.exe"</code></pre>
+      <ul>
+        <li>The program runs in the source file's folder, so relative file paths in your code start there.</li>
+        <li>Its output appears in that console window, not in Build output. If the program reads input (for example with <code>scanf</code>), type it in the console.</li>
+        <li>Because of <code>/k</code>, the window stays open at a command prompt after the program ends, so you can read the output. Close it when you're done.</li>
+        <li>Each Build &amp; Run opens a new console window. If you don't see it, check the taskbar, as it may be behind CNidavellir.</li>
+      </ul>
+    </section>
+
+    <section id="delete">
+      <h2>Delete files and folders</h2>
+      <ol class="steps">
+        <li>In the explorer, select a file or folder and press <kbd>Delete</kbd>, or right-click it and choose <b>Delete</b>.</li>
+        <li>Confirm with <b>Yes</b> when asked <em>“Delete …?”</em>.</li>
+      </ol>
+      <div class="callout warn">
+        <p><strong>Deleting is permanent.</strong> Items are not moved to the Recycle Bin.</p>
+      </div>
+      <ul>
+        <li>Only empty folders can be deleted. Deleting a folder that isn't empty fails with “Could not delete …”.</li>
+        <li>The folder at the top of the tree can't be deleted from CNidavellir.</li>
+        <li>If you delete the open file, CNidavellir first asks about any unsaved changes, then closes the tab.</li>
+      </ul>
+    </section>
+
+    <section id="session">
+      <h2>What CNidavellir remembers</h2>
+      <p>When you close the window (after the unsaved-changes prompt, if any), CNidavellir saves your session for your Windows user account:</p>
+      <ul>
+        <li>The folder open in the explorer.</li>
+        <li>The file open in the editor.</li>
+        <li>Whether a file was open at all.</li>
+      </ul>
+      <p>On the next launch, it reopens that folder and file, if they still exist and the file is a <code>.c</code>, <code>.cpp</code> or <code>.h</code> file. If you had closed the tab, it starts with no file open. If you were working on an unsaved new file, it starts with a fresh <code>Untitled.c</code>. If the last file can't be read, Build output shows “Could not restore the last file:” followed by the reason.</p>
+    </section>
+
+    <section id="shortcuts">
+      <h2>Keyboard shortcuts</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys</th><th>Where</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Editor</td><td>Undo</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Editor</td><td>Redo</td></tr>
+            <tr><td><kbd>Enter</kbd></td><td>Editor</td><td>New line with the same indentation</td></tr>
+            <tr><td><kbd>Tab</kbd></td><td>Editor</td><td>Insert a tab, shown four columns wide</td></tr>
+            <tr><td><kbd>Delete</kbd></td><td>Explorer</td><td>Delete the selected item (asks first)</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd> / <kbd>A</kbd></td><td>Editor</td><td>Copy, cut, paste and select all (standard Java text editing)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>New, Save, Open Folder and Build &amp; Run have no keyboard shortcuts. Use the toolbar buttons.</p>
+    </section>
+
+    <section id="limitations">
+      <h2>Known limitations</h2>
+      <ul class="limits">
+        <li><strong>One file at a time.</strong> There's a single file tab, so opening a file replaces the current one.</li>
+        <li><strong>Single-file programs only.</strong> Build &amp; Run compiles just the open file with fixed options. Multi-file projects, extra libraries and custom compiler flags aren't supported.</li>
+        <li><strong>New files are always <code>.c</code>.</strong> Saving a new file adds <code>.c</code> to any name that doesn't end in <code>.c</code>, so <code>main.cpp</code> becomes <code>main.cpp.c</code>. To work on a <code>.cpp</code> or <code>.h</code> file, create it outside CNidavellir and open it from the explorer.</li>
+        <li><strong>The Save dialog starts in the wrong place.</strong> For new files it opens in the folder CNidavellir was launched from, not the folder in the explorer.</li>
+        <li><strong>Only <code>.c</code>, <code>.cpp</code> and <code>.h</code> files open.</strong> Other extensions, including <code>.hpp</code>, <code>.cc</code> and <code>.txt</code>, can't be opened.</li>
+        <li><strong>C-only highlighting.</strong> <code>.cpp</code> files are coloured with C rules, so C++ words like <code>class</code>, <code>namespace</code>, <code>template</code> and <code>nullptr</code> aren't highlighted. Neither are <code>true</code>, <code>false</code> or <code>NULL</code>.</li>
+        <li><strong>No reload when the file changes on disk.</strong> If another program edits the open file, the editor keeps its own copy, and the next Save or Build &amp; Run writes over those outside changes.</li>
+        <li><strong>Limited file management.</strong> The explorer can't create, rename or move files or folders. Delete is permanent, and folders must be empty first.</li>
+        <li><strong>No line numbers, search or menus.</strong> The editor has no line-number column and no find or replace, and the app has no menu bar. Compiler errors in Build output can't be clicked to jump to the line.</li>
+        <li><strong>No debugger.</strong> The bundled toolchain includes <code>gdb</code>, but CNidavellir doesn't use it.</li>
+        <li><strong>No stop button.</strong> A running program can only be stopped from its own console window, for example by closing it.</li>
+        <li><strong>The skip-recompile check only lasts one session.</strong> The first Build &amp; Run after you start CNidavellir always compiles.</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    CNidavellir 1.0.0 for Windows x64. This guide describes the behaviour of the 1.0.0 release build. The bundled compiler is w64devkit 2.11.0. Its license notices are in <code>mingw64\COPYING.MinGW-w64-runtime.txt</code> and <code>mingw64\README.md</code>.
+  </div>
+</footer>
+
+</body>
+</html>
