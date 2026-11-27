@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CNidavellir 1.0.0 Guide</title>
-<meta name="description" content="What CNidavellir 1.0.0 can do and how to use it: setup, the folder explorer, editing C files, saving, Build &amp; Run, and known limitations.">
+<title>CNidavellir 2.0.0 Guide</title>
+<meta name="description" content="What CNidavellir 2.0.0 can do and how to use it: setup, editing, autocomplete, Build &amp; Run, the GDB debugger, known limitations, and older versions.">
 <style>
   :root {
     --bg: #f6f4ef;
@@ -18,9 +18,10 @@
     --note-border: #9bb3cc;
     --warn-bg: #fbf0e4;
     --warn-border: #d9a35c;
+    --new-bg: #eef7ee;
+    --new-border: #7fb77f;
     --kbd-bg: #f1f2f4;
     --code-bg: #0c1520;
-    --code-panel: #101d2b;
     --code-text: #d9e8fc;
     --code-line: #40556b;
     color-scheme: light;
@@ -38,9 +39,10 @@
       --note-border: #40556b;
       --warn-bg: #2a2014;
       --warn-border: #a8783a;
+      --new-bg: #13281c;
+      --new-border: #3f7a52;
       --kbd-bg: #1a2b3d;
       --code-bg: #08101a;
-      --code-panel: #0c1520;
       color-scheme: dark;
     }
   }
@@ -56,9 +58,10 @@
     --note-border: #40556b;
     --warn-bg: #2a2014;
     --warn-border: #a8783a;
+    --new-bg: #13281c;
+    --new-border: #3f7a52;
     --kbd-bg: #1a2b3d;
     --code-bg: #08101a;
-    --code-panel: #0c1520;
     color-scheme: dark;
   }
 
@@ -72,10 +75,7 @@
   }
   .wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
 
-  header.hero {
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
+  header.hero { border-bottom: 1px solid var(--border); background: var(--surface); }
   header.hero .wrap { padding-top: 40px; padding-bottom: 32px; }
   .eyebrow {
     display: inline-block;
@@ -95,7 +95,12 @@
   .btn:hover { filter: brightness(1.05); }
   .btn:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  nav.toc { margin: 28px 0 8px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  .whats-new { margin: 24px 0 8px; padding: 16px 20px; background: var(--new-bg); border: 1px solid var(--new-border); border-radius: 10px; }
+  .whats-new h2 { font-size: 18px; margin: 0 0 6px; border: 0; padding: 0; }
+  .whats-new ul { margin: 6px 0 4px; }
+  .whats-new p { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+
+  nav.toc { margin: 24px 0 8px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
   nav.toc h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; border: 0; padding: 0; }
   nav.toc ol { margin: 0; padding-left: 20px; columns: 2 220px; column-gap: 32px; }
   nav.toc li { break-inside: avoid; padding: 1px 0; }
@@ -106,6 +111,12 @@
     border-bottom: 1px solid var(--border); scroll-margin-top: 16px;
   }
   h3 { font-size: 19px; margin: 28px 0 8px; scroll-margin-top: 16px; }
+  .tag-new {
+    display: inline-block; vertical-align: middle; margin-left: 8px;
+    font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--text); background: var(--new-bg); border: 1px solid var(--new-border);
+    padding: 1px 8px; border-radius: 999px;
+  }
   p, li { max-width: 72ch; }
   a { color: var(--accent); }
   ul, ol { padding-left: 22px; }
@@ -162,8 +173,17 @@
   .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(0,0,0,.25); }
   .hl-kw { color: #bd8bff; } .hl-ty { color: #5ad8f2; } .hl-st { color: #86e987; }
   .hl-nu { color: #ff9a58; } .hl-pp { color: #7fc4ff; } .hl-co { color: #8ca4bc; }
+  .icon { display: inline-block; min-width: 1.4em; text-align: center; font-weight: 700; color: var(--accent); }
 
   .limits li { margin-top: 10px; }
+  .versions { list-style: none; padding: 0; margin: 14px 0; }
+  .versions > li { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; max-width: none; }
+  .versions > li + li { margin-top: 12px; }
+  .version-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+  .version-head strong { font-size: 20px; }
+  .version-head span { color: var(--muted); font-size: 14px; }
+  .versions p { margin: 6px 0 0; }
+  .version-links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-weight: 600; }
   footer { margin-top: 56px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
   footer .wrap { padding-top: 20px; padding-bottom: 40px; }
 
@@ -178,13 +198,13 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="eyebrow">Version 1.0.0 · Windows x64</span>
+    <span class="eyebrow">Version 2.0.0 · Windows x64 · Latest</span>
     <h1>CNidavellir feature guide</h1>
-    <p class="lede">CNidavellir is a small Windows editor for writing, compiling and running single-file C and C++ programs. This guide covers everything version 1.0.0 can do in the portable Windows release.</p>
+    <p class="lede">CNidavellir is a small Windows editor for writing, compiling, running and debugging single-file C and C++ programs. This guide covers version 2.0.0, the latest portable Windows release.</p>
     <div class="hero-actions">
-      <a class="btn primary" href="https://github.com/skgchaudhary/CNidavellir/blob/main/releases/CNidavellir-1.0.0-windows-x64.zip">Download the 1.0.0 ZIP</a>
+      <a class="btn primary" href="https://github.com/skgchaudhary/CNidavellir/blob/main/releases/CNidavellir-2.0.0-windows-x64.zip">Download the 2.0.0 ZIP</a>
       <a class="btn" href="#setup">Set up</a>
-      <a class="btn" href="#limitations">Known limitations</a>
+      <a class="btn" href="#older-versions">Older versions</a>
     </div>
   </div>
 </header>
@@ -192,10 +212,20 @@
 <div class="wrap">
 
   <figure>
-    <img src="images/editor.png" width="1491" height="950"
-         alt="The CNidavellir window. The folder explorer on the left shows a folder named c with a subfolder named flow. The editor on the right has lets.c open with colour-highlighted C code, and the empty Build output panel sits below it.">
-    <figcaption>The CNidavellir window with a folder open in the explorer and <code>lets.c</code> in the editor.</figcaption>
+    <img src="images/2.0.0-editor-debugger.png" width="1917" height="1135"
+         alt="CNidavellir 2.0.0 with lets.c open. Line numbers run down the left of the editor, an autocomplete popup suggests printf from stdio.h, and the Debugger panel on the right shows the Debug, Continue, Step and Stop buttons above the Variables, Call Stack and Watches tabs.">
+    <figcaption>CNidavellir 2.0.0 with line numbers, an autocomplete suggestion and the Debugger panel open on the right.</figcaption>
   </figure>
+
+  <section class="whats-new" aria-labelledby="new-heading">
+    <h2 id="new-heading">New in 2.0.0</h2>
+    <ul>
+      <li><strong><a href="#debug">Debugger</a>:</strong> set breakpoints by clicking line numbers, then step through C programs with the bundled GDB and inspect variables, the call stack and watch expressions.</li>
+      <li><strong><a href="#autocomplete">Autocomplete</a>:</strong> suggestions for C keywords, your own variables and functions, and common <code>stdio.h</code>, <code>stdlib.h</code> and <code>string.h</code> functions.</li>
+      <li><strong>Line numbers</strong> down the left side of the editor.</li>
+    </ul>
+    <p>Everything from 1.0.0 works as before.</p>
+  </section>
 
   <nav class="toc" aria-label="Contents">
     <h2>Contents</h2>
@@ -205,15 +235,18 @@
       <li><a href="#explorer">Open a folder</a></li>
       <li><a href="#files">Create, open and close files</a></li>
       <li><a href="#editing">Edit code</a></li>
+      <li><a href="#autocomplete">Autocomplete</a></li>
       <li><a href="#saving">Save</a></li>
       <li><a href="#build">Build &amp; Run</a></li>
       <li><a href="#build-fails">When a build fails</a></li>
       <li><a href="#no-recompile">Running without recompiling</a></li>
       <li><a href="#console">How your program is launched</a></li>
+      <li><a href="#debug">Debug a program</a></li>
       <li><a href="#delete">Delete files and folders</a></li>
       <li><a href="#session">What CNidavellir remembers</a></li>
       <li><a href="#shortcuts">Keyboard shortcuts</a></li>
       <li><a href="#limitations">Known limitations</a></li>
+      <li><a href="#older-versions">Older versions</a></li>
     </ol>
   </nav>
 
@@ -225,7 +258,7 @@
         <table>
           <tbody>
             <tr><th scope="row">Java</th><td>Java 21 or newer is required. The app is built for Java 21 and won't run on older versions. The launcher needs <code>javaw.exe</code> on your <code>PATH</code>, or Windows set up to open <code>.jar</code> files with Java.</td></tr>
-            <tr><th scope="row">GCC</th><td>Included. The ZIP contains a complete GCC toolchain (w64devkit 2.11.0) in the <code>mingw64</code> folder, with <code>gcc.exe</code> for C and <code>g++.exe</code> for C++. You don't need to install a compiler.</td></tr>
+            <tr><th scope="row">GCC and GDB</th><td>Included. The ZIP contains a complete toolchain (w64devkit 2.11.0) in the <code>mingw64</code> folder, with <code>gcc.exe</code> for C, <code>g++.exe</code> for C++ and <code>gdb.exe</code> for the debugger. You don't need to install anything else.</td></tr>
             <tr><th scope="row">Launch</th><td>Double-click <code>CNidavellir.exe</code>, or run <code>.\CNidavellir.exe</code> from PowerShell in the extracted folder.</td></tr>
           </tbody>
         </table>
@@ -233,7 +266,7 @@
 
       <ol class="steps">
         <li>Install Java 21 or newer if you don't have it.</li>
-        <li>Extract the <strong>entire</strong> ZIP into a folder of your choice. Keep <code>CNidavellir.exe</code>, <code>CNidavellir.jar</code> and the <code>mingw64</code> folder together, because Build &amp; Run looks for the compiler in <code>mingw64</code> next to <code>CNidavellir.jar</code>.</li>
+        <li>Extract the <strong>entire</strong> ZIP into a folder of your choice. Keep <code>CNidavellir.exe</code>, <code>CNidavellir.jar</code> and the <code>mingw64</code> folder together, because Build &amp; Run and Debug look for the compiler and debugger in <code>mingw64</code> next to <code>CNidavellir.jar</code>.</li>
         <li>Start CNidavellir from that folder:
 <pre><code>.\CNidavellir.exe</code></pre>
           You can also start the app directly with Java:
@@ -243,17 +276,19 @@
 
       <p>If Java can't be found, the launcher shows: <em>“Could not start CNidavellir. Install Java 21 or newer and keep CNidavellir.jar beside this launcher.”</em></p>
       <p>On first launch, the window opens with a new, unsaved file called <code>Untitled.c</code> that contains a “Hello, World!” program. The explorer stays empty until you open a folder.</p>
+      <p><strong>Upgrading from 1.0.0?</strong> Extract 2.0.0 into its own folder. It reopens the folder and file you last had open in 1.0.0, because both versions store that information in the same place.</p>
     </section>
 
     <section id="window">
       <h2>The window</h2>
-      <p>The window title shows the version: <strong>CNidavellir 1.0.0</strong>. The window has five areas. You can drag the dividers between them to resize.</p>
+      <p>The window title shows the version: <strong>CNidavellir 2.0.0</strong>. The window has six areas. You can drag the dividers between them to resize.</p>
       <div class="layout">
         <div><strong>Explorer (left)</strong><span><b>Open Folder</b>, the refresh button (↻), and a tree of the folder's contents.</span></div>
-        <div><strong>Toolbar (top right)</strong><span><b>New</b>, <b>Save</b> and <b>Build &amp; Run</b>.</span></div>
+        <div><strong>Toolbar (top)</strong><span><b>New</b>, <b>Save</b>, <b>Build &amp; Run</b> and <b>Debugger</b>, which shows or hides the Debugger panel.</span></div>
         <div><strong>File tab</strong><span>The open file's name, followed by <code>*</code> when it has unsaved changes. Click <b>×</b> to close the file.</span></div>
-        <div><strong>Editor</strong><span>Where you write code, with C syntax highlighting.</span></div>
-        <div><strong>Build output (bottom)</strong><span>Read-only messages from saving, compiling and launching.</span></div>
+        <div><strong>Editor</strong><span>Where you write code, with C syntax highlighting, autocomplete and line numbers on the left.</span></div>
+        <div><strong>Build output (bottom)</strong><span>Read-only messages from saving, compiling, launching and debugging.</span></div>
+        <div><strong>Debugger panel (right)</strong><span>Debug controls and the Variables, Call Stack and Watches tabs. It's shown when CNidavellir starts.</span></div>
       </div>
     </section>
 
@@ -267,7 +302,7 @@
       <ul>
         <li>The tree shows every file and folder, including <code>.exe</code> files. Folders are listed first, then files, each in alphabetical order (not case-sensitive).</li>
         <li>Clicking any other kind of file does nothing. Clicking the file that's already open does nothing either.</li>
-        <li>The tree refreshes when you click ↻, when you switch back to the CNidavellir window, and after every successful build, so a new <code>.exe</code> appears without extra steps. Refreshing keeps your expanded folders and selection.</li>
+        <li>The tree refreshes when you click ↻, when you switch back to the CNidavellir window, and after every successful Build &amp; Run, so a new <code>.exe</code> appears without extra steps. Refreshing keeps your expanded folders and selection.</li>
         <li>If a folder can't be read, CNidavellir shows “Could not list folder:” followed by the reason.</li>
       </ul>
     </section>
@@ -279,11 +314,11 @@
       <h3>Supported file types</h3>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Type</th><th>Open and edit</th><th>Build &amp; Run</th></tr></thead>
+          <thead><tr><th>Type</th><th>Open and edit</th><th>Build &amp; Run</th><th>Debug</th></tr></thead>
           <tbody>
-            <tr><td><code>.c</code></td><td>Yes</td><td>Yes, with <code>gcc</code> using the C17 standard</td></tr>
-            <tr><td><code>.cpp</code></td><td>Yes</td><td>Yes, with <code>g++</code> using the C++17 standard</td></tr>
-            <tr><td><code>.h</code></td><td>Yes</td><td>No. Build &amp; Run is unavailable for header files.</td></tr>
+            <tr><td><code>.c</code></td><td>Yes</td><td>Yes, with <code>gcc</code> using the C17 standard</td><td>Yes</td></tr>
+            <tr><td><code>.cpp</code></td><td>Yes</td><td>Yes, with <code>g++</code> using the C++17 standard</td><td>No</td></tr>
+            <tr><td><code>.h</code></td><td>Yes</td><td>No</td><td>No</td></tr>
           </tbody>
         </table>
       </div>
@@ -303,7 +338,7 @@
       </ol>
 
       <h3>Close a file</h3>
-      <p>Click <b>×</b> on the file tab. With no file open, the editor is blank and read-only, and <b>Save</b> and <b>Build &amp; Run</b> are unavailable. Click a file in the explorer or click <b>New</b> to continue.</p>
+      <p>Click <b>×</b> on the file tab. With no file open, the editor is blank and read-only, and <b>Save</b>, <b>Build &amp; Run</b> and <b>Debug</b> are unavailable. Click a file in the explorer or click <b>New</b> to continue.</p>
 
       <h3>Unsaved changes</h3>
       <p>If the current file has unsaved changes and you open another file, click <b>New</b>, close the tab, delete the open file, or close the window, CNidavellir asks <em>“Save changes to …?”</em>:</p>
@@ -317,6 +352,7 @@
     <section id="editing">
       <h2>Edit code</h2>
       <ul>
+        <li><strong>Line numbers:</strong> every line is numbered in the column to the left of the code. Clicking a number sets a breakpoint (see <a href="#debug">Debug a program</a>).</li>
         <li><strong>Font:</strong> code uses Consolas, or Java's standard monospaced font if Consolas isn't installed.</li>
         <li><strong>Auto-indent:</strong> pressing <kbd>Enter</kbd> starts the new line with the same spaces and tabs as the current line.</li>
         <li><strong>Tabs:</strong> <kbd>Tab</kbd> inserts a tab character, displayed four columns wide.</li>
@@ -339,16 +375,58 @@
           </tbody>
         </table>
       </div>
-<pre><code><span class="hl-pp">#include &lt;stdio.h&gt;</span>
-
-<span class="hl-co">/* Print a pointer and its value */</span>
-<span class="hl-ty">int</span> main(<span class="hl-ty">void</span>) {
-    <span class="hl-ty">int</span> x = <span class="hl-nu">10</span>;
-    <span class="hl-ty">int</span> *ptr_x = &amp;x;
-    printf(<span class="hl-st">"Address: %p\n"</span>, (<span class="hl-ty">void</span> *)ptr_x);  <span class="hl-co">// pointer</span>
-    <span class="hl-kw">return</span> <span class="hl-nu">0</span>;
-}</code></pre>
       <p><code>.cpp</code> files are coloured with the same C rules.</p>
+    </section>
+
+    <section id="autocomplete">
+      <h2>Autocomplete <span class="tag-new">New</span></h2>
+      <p>As you type, CNidavellir suggests names you can insert.</p>
+
+      <h3>When suggestions appear</h3>
+      <ul>
+        <li><strong>Automatically</strong> when you've typed at least two characters of a name (letters, digits or <code>_</code>) and pause briefly.</li>
+        <li><strong>On request</strong> with <kbd>Ctrl</kbd>+<kbd>Space</kbd>, even after just one character or none.</li>
+        <li><strong>Never</strong> inside comments or strings.</li>
+      </ul>
+
+      <h3>Using the list</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Move through the suggestions</td></tr>
+            <tr><td><kbd>Enter</kbd> or <kbd>Tab</kbd></td><td>Insert the selected suggestion</td></tr>
+            <tr><td>Double-click</td><td>Insert the clicked suggestion</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Close the list</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Inserting replaces what you typed with the full name. Only the name is inserted, without brackets or arguments, and a single <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes it. When the list isn't showing, <kbd>Enter</kbd>, <kbd>Tab</kbd>, <kbd>↑</kbd> and <kbd>↓</kbd> work as usual.</p>
+
+      <h3>What it suggests</h3>
+      <p>Suggestions match the start of the name, and matching is case-sensitive. Your own names are listed first, then keywords, each in alphabetical order, up to 20 at a time. Each suggestion shows its kind, or the header it comes from.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Shown as</th><th>Suggested when</th></tr></thead>
+          <tbody>
+            <tr><td>Variable</td><td>It's declared above the cursor and the cursor is still inside the same <code>{ }</code> block. Function parameters count as variables inside their function.</td></tr>
+            <tr><td>Function</td><td>It's declared or defined anywhere above the cursor.</td></tr>
+            <tr><td><code>&lt;stdio.h&gt;</code>, <code>&lt;stdlib.h&gt;</code>, <code>&lt;string.h&gt;</code></td><td>The file includes that header with <code>#include &lt;…&gt;</code> above the cursor. See the function list below.</td></tr>
+            <tr><td>Keyword</td><td>Always available. Covers the C keywords and basic types, from <code>auto</code> to <code>while</code>, plus <code>_Bool</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Header</th><th>Functions suggested</th></tr></thead>
+          <tbody>
+            <tr><td><code>stdio.h</code></td><td><code>printf</code> <code>scanf</code> <code>puts</code> <code>fgets</code> <code>fprintf</code> <code>snprintf</code></td></tr>
+            <tr><td><code>stdlib.h</code></td><td><code>malloc</code> <code>calloc</code> <code>realloc</code> <code>free</code> <code>qsort</code></td></tr>
+            <tr><td><code>string.h</code></td><td><code>strlen</code> <code>strcmp</code> <code>memcpy</code> <code>memmove</code> <code>memset</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Your variables and functions are recognised when they're declared with <code>int</code>, <code>char</code>, <code>void</code>, <code>float</code>, <code>double</code>, <code>long</code>, <code>short</code>, <code>_Bool</code> or a <code>struct</code> type, optionally with <code>const</code>, <code>static</code>, <code>signed</code> or <code>unsigned</code> in front. Declarations inside comments are ignored.</p>
     </section>
 
     <section id="saving">
@@ -364,15 +442,15 @@
         </li>
         <li>If saving fails, CNidavellir shows “Could not save file:” followed by the reason.</li>
       </ul>
-      <p>Build &amp; Run saves automatically before it compiles.</p>
+      <p>Build &amp; Run and Debug both save automatically before they compile.</p>
     </section>
 
     <section id="build">
       <h2>Build &amp; Run</h2>
       <figure>
-        <img src="images/build-and-run.png" width="1608" height="948"
+        <img src="images/1.0.0-build-and-run.png" width="1608" height="948"
              alt="CNidavellir after Build and Run. The Build output panel shows the lines Building lets.c, Compilation successful. Opening console, and Console opened. Check the taskbar if it is behind the IDE. A separate Command Prompt window shows the program's printed addresses and values, then a command prompt in the program's folder.">
-        <figcaption>A successful Build &amp; Run. Compiler messages appear in Build output, and the program runs in its own Command Prompt window.</figcaption>
+        <figcaption>A successful Build &amp; Run. This screenshot is from version 1.0.0, and Build &amp; Run works the same way in 2.0.0.</figcaption>
       </figure>
 
       <p>Click <b>Build &amp; Run</b> with a <code>.c</code> or <code>.cpp</code> file open, or a new unsaved file. It's unavailable when a <code>.h</code> file is open, when no file is open, and while a build is in progress.</p>
@@ -419,7 +497,7 @@
     <section id="build-fails">
       <h2>When a build fails</h2>
       <ul>
-        <li>Build output lists the compiler's error messages, which include line numbers, followed by <code>Compilation failed (exit code N).</code></li>
+        <li>Build output lists the compiler's error messages, which include line numbers, followed by <code>Compilation failed (exit code N).</code> Use the line numbers beside the editor to find each line.</li>
         <li>The program is <strong>not</strong> run, and no console window opens.</li>
         <li>Fix the errors and click <b>Build &amp; Run</b> again. After a failed build, the next Build &amp; Run always recompiles.</li>
       </ul>
@@ -436,7 +514,7 @@
       </ul>
       <div class="callout">
         <p>Files with a quoted <code>#include "…"</code> are always recompiled, because CNidavellir can't tell whether the header changed. Angle-bracket includes such as <code>#include &lt;stdio.h&gt;</code> don't count.</p>
-        <p>CNidavellir only remembers the last build until you close it. The first Build &amp; Run after starting the app always compiles.</p>
+        <p>CNidavellir only remembers the last build until you close it. The first Build &amp; Run after starting the app always compiles. Debug always compiles too.</p>
       </div>
     </section>
 
@@ -450,6 +528,82 @@
         <li>Because of <code>/k</code>, the window stays open at a command prompt after the program ends, so you can read the output. Close it when you're done.</li>
         <li>Each Build &amp; Run opens a new console window. If you don't see it, check the taskbar, as it may be behind CNidavellir.</li>
       </ul>
+    </section>
+
+    <section id="debug">
+      <h2>Debug a program <span class="tag-new">New</span></h2>
+      <p>CNidavellir can pause a C program at chosen lines so you can step through it and look at its variables. It uses GDB, which is included in the ZIP. Debugging works with <code>.c</code> files and new unsaved files (which are saved as <code>.c</code>). It isn't available for <code>.cpp</code> or <code>.h</code> files.</p>
+      <p>The Debugger panel is on the right when CNidavellir starts. Click <b>Debugger</b> in the toolbar to hide or show it.</p>
+
+      <h3>Start debugging</h3>
+      <ol class="steps">
+        <li><strong>Set breakpoints.</strong> Click a line number to put a breakpoint on that line, and click it again to remove it. You can add or remove breakpoints before or during a debug session.</li>
+        <li><strong>Click Debug</strong> at the top of the Debugger panel. CNidavellir saves the file, builds a debug version of the program, and starts GDB. Build output shows <code>Building debug executable...</code>, then <code>GDB started. Program input opens in a separate Windows console.</code></li>
+        <li><strong>Interact with the program.</strong> It runs in its own console window. If it reads input, type it there.</li>
+        <li><strong>Inspect it when it pauses.</strong> When the program reaches a breakpoint, the editor highlights that line and moves the cursor to it. The panel shows <code>Paused at lets.c:12</code> (with your file and line), and the tabs fill with the program's current state.</li>
+        <li><strong>Step or continue</strong> with the buttons below, or click <b>Stop</b> to end the session.</li>
+      </ol>
+
+      <h3>Debugger buttons</h3>
+      <p>Hover over a button to see its tooltip.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Button</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><b>Debug</b></td><td>Builds with debug symbols and starts GDB. Clicking it during a session rebuilds and starts a fresh session.</td></tr>
+            <tr><td><span class="icon">▶</span> Continue</td><td>Continues running until the next breakpoint or the end of the program.</td></tr>
+            <tr><td><span class="icon">↷</span> Step Over</td><td>Runs the current line without entering function calls.</td></tr>
+            <tr><td><span class="icon">↘</span> Step Into</td><td>Runs the current line and enters a function call.</td></tr>
+            <tr><td><span class="icon">↗</span> Step Out</td><td>Runs until the current function returns.</td></tr>
+            <tr><td><span class="icon">■</span> Stop</td><td>Ends debugging and closes the program.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Continue and the step buttons only work while the program is paused. Below the buttons, the status line shows <code>No debug session</code>, <code>Running</code> or <code>Paused at &lt;file&gt;:&lt;line&gt;</code>.</p>
+
+      <h3>Variables, Call Stack and Watches</h3>
+      <p>These tabs update every time the program pauses.</p>
+      <ul>
+        <li><strong>Variables</strong> lists the local variables and arguments of the selected function as <code>name = value</code>. Double-click a variable to add its dereferenced value (<code>*name = …</code>), which is useful for pointers. GDB shows values for simple types only here, so arrays and structs may appear without a value. Add them as watches to see their contents.</li>
+        <li><strong>Call Stack</strong> lists the active function calls, innermost first, as <code>level  function : line</code>. Click a call to see the variables and watches for that function.</li>
+        <li><strong>Watches</strong> evaluates expressions you choose. Type an expression such as <code>x * 2</code> or <code>arr[3]</code> in the box and press <kbd>Enter</kbd>. Each watch shows <code>expression = value</code>, or GDB's error message if it can't be evaluated.</li>
+      </ul>
+
+      <h3>How the debug build works</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Open file</th><th>Command CNidavellir runs</th></tr></thead>
+          <tbody>
+            <tr><td><code>lets.c</code></td><td><code>gcc.exe -g -O0 -Wall -Wextra -std=c17 lets.c -o lets-debug.exe</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><code>-g</code> adds debug information and <code>-O0</code> turns off optimisation, so the program follows your code line by line.</li>
+        <li>The debug program is saved as <code>&lt;name&gt;-debug.exe</code> next to the source file, so it never replaces the <code>&lt;name&gt;.exe</code> made by Build &amp; Run.</li>
+        <li>Debug always recompiles, even if nothing changed.</li>
+        <li>CNidavellir looks for <code>gdb.exe</code> in the same places as the compiler (<code>mingw64\bin</code> beside <code>CNidavellir.jar</code>, beside the JAR, or on your <code>PATH</code>), and also in the folder where it found <code>gcc.exe</code>.</li>
+        <li>Opening another file, clicking <b>New</b> or closing the tab ends any debug session and clears all breakpoints.</li>
+      </ul>
+
+      <h3>Debug messages in Build output</h3>
+      <div class="table-wrap">
+        <table class="wrap-code">
+          <thead><tr><th>Message</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>Building debug executable...</code></td><td>The debug build has started. Compiler warnings and errors follow.</td></tr>
+            <tr><td><code>Debug build failed.</code></td><td>The compiler reported errors. The debugger doesn't start.</td></tr>
+            <tr><td><code>GDB started. Program input opens in a separate Windows console.</code></td><td>The debug session is running.</td></tr>
+            <tr><td><code>Breakpoint N: …</code></td><td>GDB couldn't set the breakpoint on line N. The rest of the message gives GDB's reason.</td></tr>
+            <tr><td><code>GDB: …</code></td><td>GDB reported an error for a run, continue or step command.</td></tr>
+            <tr><td><code>Program exited.</code></td><td>The program finished, and the session ends.</td></tr>
+            <tr><td><code>Debug session ended.</code></td><td>GDB closed by itself.</td></tr>
+            <tr><td><code>gdb.exe was not found or could not start. Install GDB beside GCC or add it to PATH.</code></td><td>GDB is missing. Check that the <code>mingw64</code> folder is complete.</td></tr>
+            <tr><td><code>Could not start GCC: …</code></td><td>The compiler couldn't be started for the debug build.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>GDB's own status messages also appear in Build output during a session.</p>
     </section>
 
     <section id="delete">
@@ -477,6 +631,7 @@
         <li>Whether a file was open at all.</li>
       </ul>
       <p>On the next launch, it reopens that folder and file, if they still exist and the file is a <code>.c</code>, <code>.cpp</code> or <code>.h</code> file. If you had closed the tab, it starts with no file open. If you were working on an unsaved new file, it starts with a fresh <code>Untitled.c</code>. If the last file can't be read, Build output shows “Could not restore the last file:” followed by the reason.</p>
+      <p>Breakpoints, watch expressions and whether the Debugger panel was hidden are not remembered.</p>
     </section>
 
     <section id="shortcuts">
@@ -485,33 +640,53 @@
         <table>
           <thead><tr><th>Keys</th><th>Where</th><th>Action</th></tr></thead>
           <tbody>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>Space</kbd></td><td>Editor</td><td>Show autocomplete suggestions</td></tr>
+            <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Suggestion list</td><td>Move through suggestions</td></tr>
+            <tr><td><kbd>Enter</kbd> or <kbd>Tab</kbd></td><td>Suggestion list</td><td>Insert the selected suggestion</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Suggestion list</td><td>Close the list</td></tr>
             <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Editor</td><td>Undo</td></tr>
             <tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Editor</td><td>Redo</td></tr>
             <tr><td><kbd>Enter</kbd></td><td>Editor</td><td>New line with the same indentation</td></tr>
             <tr><td><kbd>Tab</kbd></td><td>Editor</td><td>Insert a tab, shown four columns wide</td></tr>
-            <tr><td><kbd>Delete</kbd></td><td>Explorer</td><td>Delete the selected item (asks first)</td></tr>
             <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd> / <kbd>A</kbd></td><td>Editor</td><td>Copy, cut, paste and select all (standard Java text editing)</td></tr>
+            <tr><td><kbd>Enter</kbd></td><td>Watches box</td><td>Add the typed expression as a watch</td></tr>
+            <tr><td><kbd>Delete</kbd></td><td>Explorer</td><td>Delete the selected item (asks first)</td></tr>
           </tbody>
         </table>
       </div>
-      <p>New, Save, Open Folder and Build &amp; Run have no keyboard shortcuts. Use the toolbar buttons.</p>
+      <p>New, Save, Open Folder, Build &amp; Run, Debug and the step commands have no keyboard shortcuts. Use the buttons.</p>
     </section>
 
     <section id="limitations">
       <h2>Known limitations</h2>
       <ul class="limits">
         <li><strong>One file at a time.</strong> There's a single file tab, so opening a file replaces the current one.</li>
-        <li><strong>Single-file programs only.</strong> Build &amp; Run compiles just the open file with fixed options. Multi-file projects, extra libraries and custom compiler flags aren't supported.</li>
+        <li><strong>Single-file programs only.</strong> Build &amp; Run and Debug compile just the open file with fixed options. Multi-file projects, extra libraries and custom compiler flags aren't supported.</li>
+        <li><strong>Debugging is C-only.</strong> <code>.cpp</code> files can be built and run, but not debugged.</li>
+        <li><strong>Breakpoints stay on fixed line numbers.</strong> They don't move when you add or remove lines above them, and they're all cleared when you open another file, click <b>New</b> or close the tab.</li>
+        <li><strong>Watches can't be removed.</strong> Once added, a watch expression stays until you close CNidavellir.</li>
+        <li><strong>Autocomplete knows a limited set of names.</strong> It suggests C keywords, your own names declared with built-in or <code>struct</code> types, and 16 library functions from three headers. Names declared with other types, such as <code>size_t</code>, <code>bool</code> or your own <code>typedef</code>s, aren't suggested, and neither are C++ names.</li>
         <li><strong>New files are always <code>.c</code>.</strong> Saving a new file adds <code>.c</code> to any name that doesn't end in <code>.c</code>, so <code>main.cpp</code> becomes <code>main.cpp.c</code>. To work on a <code>.cpp</code> or <code>.h</code> file, create it outside CNidavellir and open it from the explorer.</li>
         <li><strong>The Save dialog starts in the wrong place.</strong> For new files it opens in the folder CNidavellir was launched from, not the folder in the explorer.</li>
         <li><strong>Only <code>.c</code>, <code>.cpp</code> and <code>.h</code> files open.</strong> Other extensions, including <code>.hpp</code>, <code>.cc</code> and <code>.txt</code>, can't be opened.</li>
         <li><strong>C-only highlighting.</strong> <code>.cpp</code> files are coloured with C rules, so C++ words like <code>class</code>, <code>namespace</code>, <code>template</code> and <code>nullptr</code> aren't highlighted. Neither are <code>true</code>, <code>false</code> or <code>NULL</code>.</li>
-        <li><strong>No reload when the file changes on disk.</strong> If another program edits the open file, the editor keeps its own copy, and the next Save or Build &amp; Run writes over those outside changes.</li>
+        <li><strong>No reload when the file changes on disk.</strong> If another program edits the open file, the editor keeps its own copy, and the next Save, Build &amp; Run or Debug writes over those outside changes.</li>
         <li><strong>Limited file management.</strong> The explorer can't create, rename or move files or folders. Delete is permanent, and folders must be empty first.</li>
-        <li><strong>No line numbers, search or menus.</strong> The editor has no line-number column and no find or replace, and the app has no menu bar. Compiler errors in Build output can't be clicked to jump to the line.</li>
-        <li><strong>No debugger.</strong> The bundled toolchain includes <code>gdb</code>, but CNidavellir doesn't use it.</li>
-        <li><strong>No stop button.</strong> A running program can only be stopped from its own console window, for example by closing it.</li>
+        <li><strong>No search or menus.</strong> There's no find or replace and no menu bar. Compiler errors in Build output can't be clicked to jump to the line.</li>
+        <li><strong>No stop button for Build &amp; Run.</strong> A program started with Build &amp; Run can only be stopped from its own console window, for example by closing it. Debug sessions have their own <b>Stop</b> button.</li>
         <li><strong>The skip-recompile check only lasts one session.</strong> The first Build &amp; Run after you start CNidavellir always compiles.</li>
+      </ul>
+    </section>
+
+    <section id="older-versions">
+      <h2>Older versions</h2>
+      <p>Older releases stay available. Each has its own guide describing what that version can do.</p>
+      <ul class="versions">
+        <li>
+          <div class="version-head"><strong>1.0.0</strong><span>Built 26 Nov 2026</span></div>
+          <p>Folder explorer, C syntax highlighting, undo and redo, auto-indent, and Build &amp; Run with the bundled GCC. No debugger, autocomplete or line numbers.</p>
+          <p class="version-links"><a href="versions/1.0.0.html">Read the 1.0.0 guide</a><a href="https://github.com/skgchaudhary/CNidavellir/blob/main/releases/CNidavellir-1.0.0-windows-x64.zip">Download the 1.0.0 ZIP</a></p>
+        </li>
       </ul>
     </section>
 
@@ -520,7 +695,7 @@
 
 <footer>
   <div class="wrap">
-    CNidavellir 1.0.0 for Windows x64. This guide describes the behaviour of the 1.0.0 release build. The bundled compiler is w64devkit 2.11.0. Its license notices are in <code>mingw64\COPYING.MinGW-w64-runtime.txt</code> and <code>mingw64\README.md</code>.
+    CNidavellir 2.0.0 for Windows x64. This guide describes the behaviour of the 2.0.0 release build. The bundled toolchain is w64devkit 2.11.0. Its license notices are in <code>mingw64\COPYING.MinGW-w64-runtime.txt</code> and <code>mingw64\README.md</code>.
   </div>
 </footer>
 
